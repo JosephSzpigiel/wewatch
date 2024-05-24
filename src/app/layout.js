@@ -18,7 +18,7 @@ export default function RootLayout({ children }) {
         <main className="mb-auto mx-10">
           {children}
         </main>
-        <Footer className=' h-10 mt-auto'/>
+        <Footer className=' h-10 mt-auto z-30'/>
       </body>
     </html>
   );

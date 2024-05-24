@@ -2,6 +2,7 @@ import MovieCard from "@/components/MovieCard"
 import Carousel from "@/components/Carousel"
 
 const options = {
+  next: {revalidate: 86400},
   method: 'GET',
   headers: {
     accept: 'application/json',

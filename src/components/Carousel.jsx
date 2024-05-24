@@ -6,7 +6,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 function Carousel({cards}){
     const settings ={
-        dots: true,
+        dots: false,
         infinite: true,
         speed: 500,
         slidesToShow: 5,
@@ -18,7 +18,7 @@ function Carousel({cards}){
                     slidesToShow: 4,
                     slidesToScroll: 4,
                     infinite: true,
-                    dots: true
+                    dots: false
                 }
             },
             {
@@ -27,7 +27,7 @@ function Carousel({cards}){
                     slidesToShow: 3,
                     slidesToScroll: 3,
                     infinite: true,
-                    dots: true
+                    dots: false
                 }
             },
             {

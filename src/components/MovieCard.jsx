@@ -1,11 +1,22 @@
+'use client'
+
 import Image from "next/image"
+import { useState } from "react"
+import Link from "next/link"
 
 function MovieCard({movie}){
+    
     const posterUrl = `https://image.tmdb.org/t/p/w342${movie.poster_path}`
 
     return (
-        <div className="p-3">
-            <img src={posterUrl}/>
+        <div className={`relative flex m-3 group`}>
+            <img className={`group-hover:opacity-30`} src={posterUrl}/>
+            <div className="flex-col invisible group-hover:visible absolute w-full h-full content-center text-center">
+                <p className="text-white font-bold text-xl text-center text-wrap my-2">{movie.title ? movie.title : movie.name}</p>
+                <Link href={`/movies/${movie.id}`} className="text-white bg-orange-500 rounded p-1 by-2 m-5">
+                    Details
+                </Link>
+            </div>
         </div>
     )
 }
