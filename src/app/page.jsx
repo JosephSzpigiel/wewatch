@@ -1,4 +1,5 @@
 import MovieCard from "@/components/MovieCard"
+import Carousel from "@/components/Carousel"
 
 const options = {
   method: 'GET',
@@ -8,26 +9,40 @@ const options = {
   }
 }
 async function getTrendingMovies(){
-  const res = await fetch('https://api.themoviedb.org/3/movie/popular', options)
+  const res = await fetch('https://api.themoviedb.org/3/trending/movie/day', options)
+  return res.json()
+}
+
+async function getTrendingShows(){
+  const res = await fetch('https://api.themoviedb.org/3/trending/tv/day', options)
   return res.json()
 }
 
 
 export default async function Home() {
 
-  const trending = await getTrendingMovies()
-  console.log(trending)
+  const trendingMovies = await getTrendingMovies()
+  const trendingShows = await getTrendingShows()
 
-  const trendingMovies = trending.results.map(movie=>{
+  const trendingMovieCards = trendingMovies.results.map(movie=>{
     return (
       <MovieCard key={movie.id} movie={movie}/>
+    )
+  })
+
+  const trendingTVCards = trendingShows.results.map(show=>{
+    return (
+      <MovieCard key={show.id} movie={show}/>
     )
   })
 
 
   return (
     <div>
-      {trendingMovies}
+      <h2 className="my-4 text-xl font-bold">Trending Movies:</h2>
+      <Carousel cards={trendingMovieCards}/>
+      <h2 className="my-4 text-xl font-bold">Trending Shows:</h2>
+      <Carousel cards={trendingTVCards}/>
     </div>
     // <p>Worked!</p>
   );

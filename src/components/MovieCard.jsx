@@ -4,8 +4,8 @@ function MovieCard({movie}){
     const posterUrl = `https://image.tmdb.org/t/p/w342${movie.poster_path}`
 
     return (
-        <div>
-            <Image src={posterUrl} width={342} height={513} alt={movie.title} />
+        <div className="p-3">
+            <img src={posterUrl}/>
         </div>
     )
 }
