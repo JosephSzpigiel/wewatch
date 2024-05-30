@@ -13,9 +13,15 @@ function MovieCard({movie}){
             <img className={`group-hover:opacity-30`} src={posterUrl}/>
             <div className="flex-col invisible group-hover:visible absolute w-full h-full content-center text-center">
                 <p className="text-white font-bold text-xl text-center text-wrap my-2">{movie.title ? movie.title : movie.name}</p>
-                <Link href={`/movies/${movie.id}`} className="text-white bg-orange-500 rounded p-1 by-2 m-5">
-                    Details
-                </Link>
+                {movie.media_type === 'tv' ? 
+                    <Link href={`/tv/${movie.id}`} className="text-white bg-orange-500 rounded p-1 by-2 m-5">
+                        Details
+                    </Link> 
+                    :
+                    <Link href={`/movies/${movie.id}`} className="text-white bg-orange-500 rounded p-1 by-2 m-5">
+                        Details
+                    </Link>
+                }
             </div>
         </div>
     )

@@ -1,4 +1,4 @@
-import Details from "@/components/Details"
+import Details from "@/components/MovieDetails"
 
 function MoviePage({params, searchParams}){
 
