@@ -1,7 +1,12 @@
+import Details from "@/components/Details"
 
-function MoviePage({params}){
+function MoviePage({params, searchParams}){
 
-    return <div>{params.id}</div>
+    return(
+        <>
+            <Details id={params.id} searchParams={searchParams} />
+        </>
+    )
 }
 
 export default MoviePage
