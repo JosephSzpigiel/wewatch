@@ -1,10 +1,10 @@
 import Details from "@/components/MovieDetails"
 
-function MoviePage({params, searchParams}){
+function MoviePage({params}){
 
     return(
         <>
-            <Details id={params.id} searchParams={searchParams} />
+            <Details id={params.id}  />
         </>
     )
 }

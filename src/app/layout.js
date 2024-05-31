@@ -15,7 +15,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className + ' h-svh flex flex-col lg:mx-40 sm:mx-0'}>
         <NavBar />
-        <main className="mb-auto mx-20">
+        <main className="mb-auto mx-20 h-auto border">
           {children}
         </main>
         <Footer className=' h-10 mt-auto z-30'/>

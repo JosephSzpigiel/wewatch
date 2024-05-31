@@ -1,99 +1,115 @@
 'use client'
 import { useState, useEffect } from "react"
+import DetailsClient from "@/components/MovieDetailsClient"
 import 'dotenv/config'
 import { searchAll } from "../../../lib/TMDBFunctions"
 import Link from "next/link"
-import { usePathname, useParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-function Search({searchParams}) {
+function Search() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const pathname = usePathname()
-  const searchVal = searchParams.search
-  const page = searchParams.page
-  console.log(searchVal)
-  console.log(page)
+  const searchVal = searchParams.get('search')
+  const page = searchParams.get('page')
 
   const [search, setSearch] = useState('')
   const [results, setResults] = useState([])
-  // const [page, setPage] = useState(1)
-  // const [searchVal, setSearchVal] = useState('')
   const [error, setError] = useState(false)
   const [totalPages, setTotalPages] = useState(0)
+  const [selected, setSelected] = useState(null)
 
 useEffect(()=>{
+  setResults([])
   async function fetchData(){
     if(searchVal){
-      console.log('happend')
       const response = await searchAll(searchVal, page)
-      console.log(response)
-      const moviesTV = response.results.filter((media)=>{
-        return media.media_type === 'movie' | media.media_type === 'tv'
-      })
+      const moviesTV = removePeople(response.results)
+      setTotalPages(response.total_pages)
       console.log(moviesTV)
       setResults(moviesTV)
     }
   }
   fetchData()
-},[searchVal])
+},[])
 
-  // async function submitHandler(e) {
-  //   e.preventDefault()
-  //   setError('')
-  //   // setResults([])
-  //   // setPage(1)
-  //   const response = await searchAll(search, page)
-  //   const moviesTV = response.results.filter((media)=>{
-  //     return media.media_type === 'movie' | media.media_type === 'tv'
-  //   })
-  //   setResults(moviesTV)
-  //   setTotalPages(response.total_pages)
-  //   setSearchVal(search)
-  //   setSearch('')
-  // }
+  function removePeople(results){
+    return(
+      results.filter((media)=>{
+        return media.media_type === 'movie' | media.media_type === 'tv'
+      })
+    )
+  }
+
+  async function submitHandler(e) {
+    e.preventDefault()
+    setError('')
+    // setResults([])
+    router.push(`/search?search=` + search + '&page=1', { scroll: false })
+    const response = await searchAll(search, 1)
+    const moviesTV = removePeople(response.results)
+    setResults(moviesTV)
+    setTotalPages(response.total_pages)
+    setSearch('')
+  }
 
   function changeHandler(e) {
       setSearch(e.target.value)
   }
 
-  // async function handleMore(e){
-  //   const response = await searchAll(searchVal, page+1)
-  //   console.log(response)
-  //   setResults(current => [...current, ...response.results])
-  //   setPage(current => current + 1)
-  // }
+  async function handleMore(e){
+    const response = await searchAll(searchVal, page+1)
+    const moviesTV = removePeople(response.results)
+    setResults(current => [...current, ...moviesTV])
+    router.push(`/search?search=`+searchVal + '&page=' + (parseInt(page)+1), { scroll: false })
+  }
+
+  const handleSelect = media => async function (){
+    setSelected(media)
+  }
 
   const mediaComponents = results.map((media)=>{
     return(
       media.media_type === "movie" ? 
-        <div key={media.id}>
-          <Link href={`/movies/${media.id}`}>{media.title}</Link>
+        <div key={media.id} className='w-md h-sm bg-white'>
+          <button onClick={handleSelect(media)} className='text-black text-center w-full'>{media.title}</button>
         </div> :
-        <div key={media.id}>
-        <Link href={`/tv/${media.id}`}>{media.name}</Link>
-      </div>
+        <div key={media.id} className='w-md bg-white'>
+          <button onClick={handleSelect(media)} className='text-black text-center w-full'>{media.name}</button>
+        </div>
     )
   })
 
   function SeeMore(){
-      return page < totalPages ? <button className='submit see-more' onClick={handleMore}>See More</button> : <p>No More Results</p>
+      return (page < totalPages ? 
+        <button className='submit see-more' onClick={handleMore}>
+          See More
+        </button> : 
+        <p>No More Results</p>)
   }
 
     return (
-      <div>
-        <form>
-        {/* <form onSubmit = {submitHandler}> */}
-            <input required className="text-input search text-black" placeholder="Search Movie" value={search} onChange={changeHandler}></input>
-            {/* <input className= "submit" type="submit" value="Search"></input> */}
-            <Link href={pathname + '?' + 'search='+ search +'&' + 'page=1'}>Search</Link>
-        </form>
-        {(searchVal)? (
-            <div>
-                <h2>Results: {`${searchVal}`}</h2>
-                <div className="container">{mediaComponents}</div>
-                {mediaComponents.length !== 0 ? (<SeeMore/>) : null}
-            </div>
-        ): null
-        }
-        {(mediaComponents.length === 0) ? (<div>{error}</div>):  null}
+      <div className='flex h-full '>
+        <aside className="w-1/3 border-2 h-full">
+          <form onSubmit={submitHandler}>
+            <input required className="text-input text-black" placeholder="Search Movie" value={search} onChange={changeHandler}></input>
+            {/* <Link href={pathname + '?' + 'search='+ search +'&' + 'page=1'}>Search</Link> */}
+            <input type="submit" value='search'></input>
+          </form>
+          {(searchVal)? (
+              <div>
+                  <h2 className="text-lg bold">Results: {`${searchVal}`}</h2>
+                  <div className="border-2 rounded overflow-y-auto">{mediaComponents}</div>
+                  {mediaComponents.length !== 0 ? (<SeeMore/>) : null}
+              </div>
+          ): null
+          }
+          {(mediaComponents.length === 0) ? (<div>{error}</div>):  null}
+        </aside>
+        <div>
+          {selected ? <DetailsClient id={selected.id}/>: <p>Search for a Movie or TV show</p>}
+        </div>
+
       </div>
     )
   }
