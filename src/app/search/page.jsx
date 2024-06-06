@@ -1,10 +1,13 @@
 'use client'
 import { useState, useEffect } from "react"
 import DetailsClient from "@/components/MovieDetailsClient"
+import DetailsTV from "@/components/TVDetailsClient"
 import 'dotenv/config'
 import { searchAll } from "../../../lib/TMDBFunctions"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import {TvIcon} from "@heroicons/react/20/solid"
+
 
 function Search() {
   const router = useRouter()
@@ -19,19 +22,19 @@ function Search() {
   const [totalPages, setTotalPages] = useState(0)
   const [selected, setSelected] = useState(null)
 
-useEffect(()=>{
-  setResults([])
-  async function fetchData(){
-    if(searchVal){
-      const response = await searchAll(searchVal, page)
-      const moviesTV = removePeople(response.results)
-      setTotalPages(response.total_pages)
-      console.log(moviesTV)
-      setResults(moviesTV)
+  useEffect(()=>{
+    setResults([])
+    async function fetchData(){
+      if(searchVal){
+        const response = await searchAll(searchVal, page)
+        const moviesTV = removePeople(response.results)
+        setTotalPages(response.total_pages)
+        console.log(moviesTV)
+        setResults(moviesTV)
+      }
     }
-  }
-  fetchData()
-},[])
+    fetchData()
+  },[])
 
   function removePeople(results){
     return(
@@ -70,13 +73,9 @@ useEffect(()=>{
 
   const mediaComponents = results.map((media)=>{
     return(
-      media.media_type === "movie" ? 
-        <div key={media.id} className='w-md h-sm bg-white'>
-          <button onClick={handleSelect(media)} className='text-black text-center w-full'>{media.title}</button>
-        </div> :
-        <div key={media.id} className='w-md bg-white'>
-          <button onClick={handleSelect(media)} className='text-black text-center w-full'>{media.name}</button>
-        </div>
+        <button key={media.id} onClick={handleSelect(media)} className='w-md h-sm bg-white text-black text-left p-2 w-full'>
+          {media.media_type === "movie" ? 'Movie- ' + media.title : 'TV- ' + media.name}
+        </button>
     )
   })
 
@@ -89,25 +88,30 @@ useEffect(()=>{
   }
 
     return (
-      <div className='flex h-full '>
-        <aside className="w-1/3 border-2 h-full">
+      <div className='grid grid-cols-3'>
+        <aside className="border-2 col-span-1">
           <form onSubmit={submitHandler}>
-            <input required className="text-input text-black" placeholder="Search Movie" value={search} onChange={changeHandler}></input>
-            {/* <Link href={pathname + '?' + 'search='+ search +'&' + 'page=1'}>Search</Link> */}
-            <input type="submit" value='search'></input>
+            <div className="flex flex-col justify-center">
+              <input required className="text-input w-full text-black block rounded-lg p-1" placeholder="Search Movie" value={search} onChange={changeHandler}></input>
+              {/* <Link href={pathname + '?' + 'search='+ search +'&' + 'page=1'}>Search</Link> */}
+              <input type="submit" value='Search' className=" bg-white text-black rounded-lg mt-5"></input>
+            </div>
           </form>
           {(searchVal)? (
               <div>
                   <h2 className="text-lg bold">Results: {`${searchVal}`}</h2>
-                  <div className="border-2 rounded overflow-y-auto">{mediaComponents}</div>
+                  <div className="border-2 rounded overflow-y-auto h-96">{mediaComponents}</div>
                   {mediaComponents.length !== 0 ? (<SeeMore/>) : null}
               </div>
           ): null
           }
           {(mediaComponents.length === 0) ? (<div>{error}</div>):  null}
         </aside>
-        <div>
-          {selected ? <DetailsClient id={selected.id}/>: <p>Search for a Movie or TV show</p>}
+        <div className="col-span-2">
+          {selected ? 
+            selected.media_type === "movie" ? 
+            <DetailsClient id={selected.id}/>: <DetailsTV id={selected.id}/> : 
+            <p className=" text-center">Search for a Movie or TV show</p>}
         </div>
 
       </div>
