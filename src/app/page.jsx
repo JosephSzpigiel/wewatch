@@ -1,6 +1,8 @@
 import MovieCard from "@/components/MovieCard"
 import Carousel from "@/components/Carousel"
 import { getTrendingMovies, getTrendingShows } from "../../lib/TMDBFunctions"
+import { PrismaClient } from "@prisma/client"
+import { prisma } from "@/lib/db"
 
 // import 'dotenv/config'
 
@@ -24,6 +26,28 @@ import { getTrendingMovies, getTrendingShows } from "../../lib/TMDBFunctions"
 
 
 export default async function Home() {
+
+  const users = await prisma.user.findUnique({
+    where:{
+      id : 1
+    },
+    include: {
+      movies: true,
+      primary: {
+        include: {
+          movies: true
+        }
+      },
+      secondary: {
+        include: {
+          movies: true
+        }
+      }
+    }
+  }
+    
+  )
+  console.log(users)
 
   const trendingMovies = await getTrendingMovies()
   const trendingShows = await getTrendingShows()
