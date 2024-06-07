@@ -7,6 +7,7 @@ import { searchAll } from "../../../lib/TMDBFunctions"
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import {TvIcon} from "@heroicons/react/20/solid"
+import Pagination from "@/components/Pagination"
 
 
 function Search() {
@@ -27,6 +28,7 @@ function Search() {
     async function fetchData(){
       if(searchVal){
         const response = await searchAll(searchVal, page)
+        console.log(response.results)
         const moviesTV = removePeople(response.results)
         setTotalPages(response.total_pages)
         console.log(moviesTV)
@@ -60,11 +62,11 @@ function Search() {
       setSearch(e.target.value)
   }
 
-  async function handleMore(e){
-    const response = await searchAll(searchVal, page+1)
+  async function newPage(page){
+    const response = await searchAll(searchVal, page)
     const moviesTV = removePeople(response.results)
-    setResults(current => [...current, ...moviesTV])
-    router.push(`/search?search=`+searchVal + '&page=' + (parseInt(page)+1), { scroll: false })
+    setResults([ ...moviesTV])
+    router.push(`/search?search=`+searchVal + '&page=' + (page), { scroll: false })
   }
 
   const handleSelect = media => async function (){
@@ -79,13 +81,13 @@ function Search() {
     )
   })
 
-  function SeeMore(){
-      return (page < totalPages ? 
-        <button className='submit see-more' onClick={handleMore}>
-          See More
-        </button> : 
-        <p>No More Results</p>)
-  }
+  // function SeeMore(){
+  //     return (page < totalPages ? 
+  //       <button className='submit see-more' onClick={handleMore}>
+  //         See More
+  //       </button> : 
+  //       <p>No More Results</p>)
+// }
 
     return (
       <div className='grid grid-cols-3'>
@@ -101,7 +103,8 @@ function Search() {
               <div>
                   <h2 className="text-lg bold">Results: {`${searchVal}`}</h2>
                   <div className="border-2 rounded overflow-y-auto h-96">{mediaComponents}</div>
-                  {mediaComponents.length !== 0 ? (<SeeMore/>) : null}
+                  {/* {mediaComponents.length !== 0 ? (<SeeMore/>) : null} */}
+                  <Pagination page={page} totalPages={totalPages} newPage={newPage}/>
               </div>
           ): null
           }
